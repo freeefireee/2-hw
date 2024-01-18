@@ -1,6 +1,7 @@
 import axios from 'axios';
 import React, { useEffect, useState } from 'react';
 import { Link, useParams, useNavigate } from 'react-router-dom';
+import './PostDetails.css';
 
 const getShortValue = (value, maxLength) => {
   if (value.length > maxLength) {
@@ -36,8 +37,7 @@ const PostDetails = () => {
   };
 
   return (
-    <div>
-      <h1>Подробности поста</h1>
+    <div className="block2">
       {post ? (
         <div>
           <h2>{post.title}</h2>
