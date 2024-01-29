@@ -1,53 +1,32 @@
-import axios from 'axios';
-import React, { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
-import './posts.css';
-
-const getShortValue = (value, maxLength) => {
-  if (value.length > maxLength) {
-    return value.substring(0, maxLength) + '...';
-  }
-  return value;
-};
+import React, { useEffect } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { fetchPosts } from '../../redux/postsSlice';
 
 const Posts = () => {
-  const [posts, setPosts] = useState([]);
+  const dispatch = useDispatch();
+  const posts = useSelector((state) => state.posts.posts);
+  const status = useSelector((state) => state.posts.status);
+  const error = useSelector((state) => state.posts.error);
 
   useEffect(() => {
-    const fetchPosts = async () => {
-      try {
-        const response = await axios.get('https://jsonplaceholder.typicode.com/posts');
-        setPosts(response.data);
-      } catch (error) {
-        console.error('Error fetching posts:', error);
-      }
-    };
+    if (status === 'idle') {
+      dispatch(fetchPosts());
+    }
+  }, [dispatch, status]);
 
-    fetchPosts();
-  }, []);
+  if (status === 'loading') {
+    return <div>Loading...</div>;
+  }
 
-  const handleMoreClick = (postId) => {
-    console.log(`Ещё: ${postId}`);
-  };
+  if (status === 'failed') {
+    return <div>Error: {error}</div>;
+  }
 
   return (
-    <div className='block-content'>
+    <div>
+      <h1>Posts</h1>
       {posts.map((post) => (
-        <div className='key' key={post.id}>
-          <div className="block">
-            <div className="text">
-          <h1>{post.id}</h1>
-          <h2>{post.title}</h2>
-          <h4>{getShortValue(post.body, 20)}</h4>
-          <div>
-            <Link className='more' to={`/posts/${post.id}`}>More...</Link>
-            <button className='details' onClick={() => handleMoreClick(post.id)}>
-              <Link to={`/posts/${post.id}`}>Details</Link>
-            </button>
-            </div>
-            </div>
-          </div>
-        </div>
+        <div key={post.id}>{post.title}</div>
       ))}
     </div>
   );
